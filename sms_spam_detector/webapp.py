@@ -4,7 +4,7 @@ import json
 import csv
 import html
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from urllib.parse import parse_qs
+from urllib.parse import parse_qs, urlparse
 
 ROOT = os.path.dirname(__file__)
 sys.path.insert(0, ROOT)
@@ -171,7 +171,8 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_GET(self):
-        if self.path.startswith('/api/status'):
+        path = urlparse(self.path).path
+        if path == '/api/status':
             vec, clf = load_model()
             data = {'trained': vec is not None}
             self.send_response(200)
@@ -186,7 +187,8 @@ class Handler(BaseHTTPRequestHandler):
         length = int(self.headers.get('Content-Length', 0))
         body = self.rfile.read(length).decode('utf-8')
         params = parse_qs(body)
-        if self.path == '/train':
+        path = urlparse(self.path).path
+        if path == '/train':
             n = int(params.get('n', ['20'])[0])
             count = train_model(n=n)
             self.send_response(200)
@@ -194,7 +196,7 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(f'Trained on {count} samples'.encode('utf-8'))
             return
-        if self.path == '/clear':
+        if path == '/clear':
             # remove model file if exists
             try:
                 if os.path.exists(MODEL_PATH):
@@ -205,7 +207,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_response(500)
                 self.end_headers()
             return
-        if self.path == '/predict':
+        if path == '/predict':
             message = params.get('message', [''])[0]
             vec, clf = load_model()
             if vec is None:
