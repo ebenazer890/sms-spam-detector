@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: sms-spam-detector
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python webapp.pycd "C:\Users\91755\Desktop\sms spam"

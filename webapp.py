@@ -1,4 +1,4 @@
-import osgit remote add origin https://github.com/ebenazer890/sms-spam-detector.gitgit remote add origin https://github.com/ebenazer890/sms-spam-detector.git
+import os
 import sys
 import json
 import csv
@@ -601,7 +601,8 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
 if __name__ == '__main__':
-    port = 8000
+    # Allow overriding the port via PORT env var for container/platform deploys
+    port = int(os.environ.get('PORT', '8000'))
     server = HTTPServer(('0.0.0.0', port), Handler)
-    print(f'Serving on http://localhost:{port} - open in your browser')
+    print(f'Serving on http://0.0.0.0:{port} - open in your browser')
     server.serve_forever()
